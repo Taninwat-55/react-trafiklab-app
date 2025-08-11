@@ -1,0 +1,127 @@
+import { useState, useEffect } from 'react';
+
+// --- TYPER ---
+
+// Beskriver hur en enskild avgång ser ut från API:et
+interface Departure {
+  name: string;      // T.ex. "Öresundståg", "SJ Snabbtåg"
+  type: string;      // T.ex. "TÅG"
+  time: string;      // Planerad tid, "13:45:00"
+  rtTime?: string;   // Realtid, om den avviker, "13:47:00"
+  track: string;     // Spår, t.ex. "15"
+  direction: string; // Slutdestination, t.ex. "Göteborg C"
+}
+
+// Beskriver de "props" (parametrar) som komponenten tar emot
+interface DepartureBoardProps {
+  stationId: string;
+  stationName: string; // Bra att skicka med namnet för att visa i rubriken
+}
+
+
+// --- KOMPONENTEN ---
+
+export const DepartureBoard = ({ stationId, stationName }: DepartureBoardProps) => {
+  // State för att hålla reda på avgångar, laddning och fel
+  const [departures, setDepartures] = useState<Departure[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Hämta API-nyckeln för avgångstavlor
+  const apiKey = import.meta.env.VITE_STOLPTIDSTABELLER_API_KEY;
+
+  // Denna "effekt" körs varje gång stationId ändras
+  useEffect(() => {
+    // Hoppa över om vi inte har något stationId
+    if (!stationId) return;
+
+    const fetchDepartures = async () => {
+      // Återställ state för varje ny sökning
+      setIsLoading(true);
+      setError(null);
+      setDepartures([]);
+
+      const url = `https://api.resrobot.se/v2.1/departureBoard?id=${stationId}&format=json&accessId=${apiKey}`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Kunde inte hämta avgångar. Status: ${response.status}`);
+        }
+        const data = await response.json();
+        
+        // Sätt avgångarna. Om "Departure" inte finns, sätt en tom array.
+        setDepartures(data.Departure || []);
+
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Ett okänt fel inträffade.");
+        }
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDepartures();
+  }, [stationId, apiKey]); // Effektens beroenden
+
+  // Villkorlig rendering baserat på state
+  if (isLoading) {
+    return <div className="p-4 text-center text-gray-500">Laddar avgångar...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-center text-red-500 bg-red-100 rounded-lg">{error}</div>;
+  }
+
+  // --- JSX (det som visas) ---
+  return (
+    <div className="w-full max-w-4xl p-4 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">
+        Avgångar från {stationName}
+      </h2>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-3 text-sm font-semibold text-gray-600">Tid</th>
+              <th className="p-3 text-sm font-semibold text-gray-600">Till</th>
+              <th className="p-3 text-sm font-semibold text-gray-600 hidden sm:table-cell">Linje</th>
+              <th className="p-3 text-sm font-semibold text-gray-600">Spår</th>
+            </tr>
+          </thead>
+          <tbody>
+            {departures.length > 0 ? (
+              departures.map((dep, index) => (
+                <tr key={index} className="border-b border-gray-100 last:border-b-0">
+                  <td className="p-3 font-mono">
+                    {dep.rtTime && dep.rtTime !== dep.time ? (
+                      <>
+                        <span className="line-through text-gray-500">{dep.time.substring(0, 5)}</span>
+                        <span className="font-bold text-red-500 ml-2">{dep.rtTime.substring(0, 5)}</span>
+                      </>
+                    ) : (
+                      <span className="font-bold">{dep.time.substring(0, 5)}</span>
+                    )}
+                  </td>
+                  <td className="p-3 font-semibold">{dep.direction}</td>
+                  <td className="p-3 text-gray-600 hidden sm:table-cell">{dep.name}</td>
+                  <td className="p-3 font-bold text-center">{dep.track}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="p-4 text-center text-gray-500">
+                  Inga kommande avgångar hittades.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
