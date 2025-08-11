@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 
 // --- TYPER ---
 interface Departure {
-  name: string; // T.ex. "Öresundståg", "SJ Snabbtåg"
-  type: string; // T.ex. "TÅG"
-  time: string; // Planerad tid, "13:45:00"
-  rtTime?: string; // Realtid, om den avviker, "13:47:00"
-  track: string; // Spår, t.ex. "15"
-  direction: string; // Slutdestination, t.ex. "Göteborg C"
+  name: string; 
+  type: string; 
+  time: string; 
+  rtTime?: string; 
+  track: string; 
+  direction: string; 
 }
 
 interface DepartureBoardProps {
