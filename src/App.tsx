@@ -38,7 +38,7 @@ function App() {
         }`}
       >
         <div className='w-full max-w-md text-center'>
-          <h1 className='text-4xl font-bold text-gray-800'>Rese-Selfie</h1>
+          <h1 className='text-4xl font-bold text-gray-800'>Check-in & Go</h1>
           <p className='text-gray-600 mt-2'>
             Sök en hållplats, se avgångar och checka in med en selfie!
           </p>
