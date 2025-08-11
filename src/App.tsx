@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { StationSearch } from './components/StationSearch';
 import { DepartureBoard } from './components/DepartureBoard';
-import { CameraSelfie } from './components/CameraSelfie'; 
+import { CameraSelfie } from './components/CameraSelfie';
+import { Header } from './components/Header';
 
 interface Station {
   name: string;
@@ -16,59 +17,70 @@ function App() {
 
   const handleStationSelect = (station: Station) => {
     setSelectedStation(station);
-    setCurrentView('departures'); 
+    setCurrentView('departures');
   };
 
   const handleStartNewSearch = () => {
     setSelectedStation(null);
-    setCurrentView('search'); 
+    setCurrentView('search');
   };
 
   const handleCheckIn = () => {
-    setCurrentView('selfie'); 
+    setCurrentView('selfie');
   };
 
   return (
-    <main className="bg-gray-100 min-h-screen flex flex-col items-center pt-10 sm:pt-20 p-4">
+    <main className='bg-gray-100 min-h-screen flex flex-col items-center pt-10 sm:pt-12 p-4'>
       {/* SÖK-VYN */}
-      {currentView === 'search' && (
-        <div className="w-full max-w-md space-y-8">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-800 text-center">
-              Min Avgångstavla
-            </h1>
-            <p className="text-gray-600 text-center mt-2">
-              Sök en hållplats för att se avgångar i realtid
-            </p>
-          </div>
-          <StationSearch onStationSelect={handleStationSelect} />
+      <div
+        className={`view ${
+          currentView === 'search' ? 'view-visible' : 'view-hidden'
+        }`}
+      >
+        <div className='w-full max-w-md text-center'>
+          <h1 className='text-4xl font-bold text-gray-800'>Rese-Selfie</h1>
+          <p className='text-gray-600 mt-2'>
+            Sök en hållplats, se avgångar och checka in med en selfie!
+          </p>
         </div>
-      )}
+        <StationSearch onStationSelect={handleStationSelect} />
+      </div>
 
       {/* AVGÅNGS-VYN */}
-      {currentView === 'departures' && selectedStation && (
-        <div className="w-full flex flex-col items-center gap-8">
-          <button 
-            onClick={handleStartNewSearch}
-            className="w-full max-w-md p-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700"
-          >
-            Sök ny station
-          </button>
-          <DepartureBoard 
-            stationId={selectedStation.id} 
-            stationName={selectedStation.name}
-            onCheckIn={handleCheckIn}
-          />
-        </div>
-      )}
+      <div
+        className={`view ${
+          currentView === 'departures' ? 'view-visible' : 'view-hidden'
+        }`}
+      >
+        {selectedStation && (
+          <>
+            <Header
+              stationName={selectedStation.name}
+              onNewSearch={handleStartNewSearch}
+              onCheckIn={handleCheckIn}
+            />
+            <DepartureBoard
+              stationId={selectedStation.id}
+              stationName={selectedStation.name}
+              onCheckIn={handleCheckIn}
+            />
+          </>
+        )}
+      </div>
 
       {/* SELFIE-VYN */}
-      {currentView === 'selfie' && selectedStation && (
-        <CameraSelfie 
-          stationName={selectedStation.name}
-          onClose={handleStartNewSearch} 
-        />
-      )}
+      <div
+        className={`view ${
+          currentView === 'selfie' ? 'view-visible' : 'view-hidden'
+        }`}
+      >
+        {selectedStation && (
+          <CameraSelfie
+            stationName={selectedStation.name}
+            onClose={handleStartNewSearch}
+          />
+        )}
+      </div>
     </main>
   );
 }

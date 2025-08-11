@@ -19,7 +19,7 @@ interface DepartureBoardProps {
 export const DepartureBoard = ({
   stationId,
   stationName,
-  onCheckIn,
+  // onCheckIn,
 }: DepartureBoardProps) => {
   const [departures, setDepartures] = useState<Departure[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -134,14 +134,14 @@ export const DepartureBoard = ({
         </table>
       </div>
 
-      <div className='mt-6 text-center'>
+      {/* <div className='mt-6 text-center'>
         <button
           onClick={onCheckIn}
           className='px-8 py-3 bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700 transition'
         >
           📸 Checka in på {stationName}
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };
