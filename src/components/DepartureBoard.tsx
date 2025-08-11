@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 
 // --- TYPER ---
-
-// Beskriver hur en enskild avgång ser ut från API:et
 interface Departure {
   name: string;      // T.ex. "Öresundståg", "SJ Snabbtåg"
   type: string;      // T.ex. "TÅG"
@@ -12,31 +10,22 @@ interface Departure {
   direction: string; // Slutdestination, t.ex. "Göteborg C"
 }
 
-// Beskriver de "props" (parametrar) som komponenten tar emot
 interface DepartureBoardProps {
   stationId: string;
-  stationName: string; // Bra att skicka med namnet för att visa i rubriken
+  stationName: string; 
 }
 
-
-// --- KOMPONENTEN ---
-
 export const DepartureBoard = ({ stationId, stationName }: DepartureBoardProps) => {
-  // State för att hålla reda på avgångar, laddning och fel
   const [departures, setDepartures] = useState<Departure[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Hämta API-nyckeln för avgångstavlor
   const apiKey = import.meta.env.VITE_STOLPTIDSTABELLER_API_KEY;
 
-  // Denna "effekt" körs varje gång stationId ändras
   useEffect(() => {
-    // Hoppa över om vi inte har något stationId
     if (!stationId) return;
 
     const fetchDepartures = async () => {
-      // Återställ state för varje ny sökning
       setIsLoading(true);
       setError(null);
       setDepartures([]);
@@ -50,7 +39,6 @@ export const DepartureBoard = ({ stationId, stationName }: DepartureBoardProps) 
         }
         const data = await response.json();
         
-        // Sätt avgångarna. Om "Departure" inte finns, sätt en tom array.
         setDepartures(data.Departure || []);
 
       } catch (err) {
@@ -66,9 +54,8 @@ export const DepartureBoard = ({ stationId, stationName }: DepartureBoardProps) 
     };
 
     fetchDepartures();
-  }, [stationId, apiKey]); // Effektens beroenden
+  }, [stationId, apiKey]); 
 
-  // Villkorlig rendering baserat på state
   if (isLoading) {
     return <div className="p-4 text-center text-gray-500">Laddar avgångar...</div>;
   }
@@ -77,7 +64,6 @@ export const DepartureBoard = ({ stationId, stationName }: DepartureBoardProps) 
     return <div className="p-4 text-center text-red-500 bg-red-100 rounded-lg">{error}</div>;
   }
 
-  // --- JSX (det som visas) ---
   return (
     <div className="w-full max-w-4xl p-4 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">

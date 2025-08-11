@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { StationSearch } from './components/StationSearch';
-import { DepartureBoard } from './components/DepartureBoard'; // Importera den nya komponenten
+import { DepartureBoard } from './components/DepartureBoard'; 
 
 interface Station {
   name: string;
@@ -17,7 +17,7 @@ function App() {
   return (
     <main className="bg-gray-100 min-h-screen flex flex-col items-center pt-10 sm:pt-20 p-4">
       <div className="w-full max-w-md space-y-8">
-        {!selectedStation && ( // Visa bara rubriken om ingen station är vald
+        {!selectedStation && ( 
             <div>
                 <h1 className="text-4xl font-bold text-gray-800 text-center">
                     Min Avgångstavla
@@ -28,7 +28,6 @@ function App() {
             </div>
         )}
         
-        {/* Om en station är vald, visa en "Sök igen"-knapp */}
         {selectedStation ? (
           <button 
             onClick={() => setSelectedStation(null)}
@@ -41,7 +40,6 @@ function App() {
         )}
       </div>
 
-      {/* Om en station är vald, visa avgångstavlan */}
       <div className="mt-8 w-full">
         {selectedStation && (
           <DepartureBoard 
